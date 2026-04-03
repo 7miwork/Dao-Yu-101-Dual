@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 permissions:
   contents: read
   pages: write
@@ -24,7 +27,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
 
       - name: Install dependencies
@@ -32,6 +35,15 @@ jobs:
 
       - name: Build applications
         run: npm run build
+
+      - name: Verify build output
+        run: |
+          if [ ! -d "apps/student/out" ]; then
+            echo "❌ Build output directory not found!"
+            exit 1
+          fi
+          echo "✅ Build output verified"
+          ls -la apps/student/out/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
